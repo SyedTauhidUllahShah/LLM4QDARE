@@ -133,10 +133,10 @@ The framework generates several outputs in the `results/` directory:
 ## Citation
 
 If you use this framework in your research, please cite:
-
+```bibtex
 **Shah, S. T. U., Hussein, M., Barcomb, A., & Moshirpour, M. (2025).**  
 *From Inductive to Deductive: Evaluating Large Language Models for Qualitative Data Analysis in Requirements Engineering.* .
-
+```
 ## Contact
 
 For questions or collaborations, please contact:
