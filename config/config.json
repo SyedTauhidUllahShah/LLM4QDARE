@@ -1,0 +1,438 @@
+{
+    "api_key": "input your api_key here",
+    "model": "gpt-4-turbo",
+    "datasets": {
+        "lms": {
+            "path": "lms.csv",
+            "context": "This is a Library Management System (LMS) that handles cataloging, user management, loans, and digital resources. The system manages library operations, including book tracking, member management, and borrowing processes.",
+            "detailed_context": "The Library Management System (LMS) is designed to manage all aspects of a modern library, including resource cataloging, user management, loan processing, and digital resource management. The system tracks all physical and digital resources in the library's collection, manages user accounts and privileges, processes loans and returns, handles reservations and renewals, manages fines and payments, and provides search functionality for the library catalog. It also includes administrative features for librarians and staff to maintain the collection and generate reports on library usage."
+        },
+        "smart_home": {
+            "path": "smart.csv",
+            "context": "This is a Smart Home System that manages security, energy control, and device management for an automated household.",
+            "detailed_context": "The Smart Home System integrates multiple home automation technologies to provide a centralized control system for various aspects of residential living. It includes security features like door locks, cameras, and motion sensors; energy management features for controlling lighting, temperature, and power consumption; device management for connecting and controlling various smart appliances and entertainment systems; and user interfaces through mobile apps, voice commands, and control panels. The system is designed to enhance comfort, security, and energy efficiency while providing convenient control options for the homeowners."
+        }
+    },
+    "examples": {
+        "lms": {
+            "one-shot": [
+                {
+                    "requirement": "Notifications about lost item penalties must explain alternative settlement options.",
+                    "label": "Notification"
+                },
+                {
+                    "requirement": "Borrowed items flagged for immediate return due to high demand must trigger an urgent alert for users.",
+                    "label": "Loan"
+                },
+                {
+                    "requirement": "Reserved books requiring immediate staff intervention must trigger priority alerts.",
+                    "label": "Reservation"
+                },
+                {
+                    "requirement": "Borrowing history should display timestamps for each action to improve traceability.",
+                    "label": "Record"
+                },
+                {
+                    "requirement": "Monthly newsletters should include highlights from each branch.",
+                    "label": "Library"
+                },
+                {
+                    "requirement": "Notifications about delayed returns must outline how fines are calculated.",
+                    "label": "Fine"
+                },
+                {
+                    "requirement": "Admins must track usage statistics for multimedia resources separately from books.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "Catalog entries for rare collections must include high-resolution images.",
+                    "label": "Catalog"
+                },
+                {
+                    "requirement": "Members must have access to secure communication channels with staff.",
+                    "label": "Member"
+                },
+                {
+                    "requirement": "Staff must have access to automated overdue item reports.",
+                    "label": "Report"
+                },
+                {
+                    "requirement": "Users should receive alerts about upcoming availability for materials.",
+                    "label": "Book"
+                },
+                {
+                    "requirement": "Notifications about library-hosted career fairs must include participating organizations.",
+                    "label": "Event"
+                },
+                {
+                    "requirement": "Staff must have access to a dashboard summarizing overdue items.",
+                    "label": "Staff"
+                },
+                {
+                    "requirement": "Authentication failures must trigger a lockout after five incorrect attempts.",
+                    "label": "Authentication"
+                }
+            ],
+            "few-shot": [
+                {
+                    "requirement": "Notifications about lost item penalties must explain alternative settlement options.",
+                    "label": "Notification"
+                },
+                {
+                    "requirement": "Notifications about delayed returns must outline how fines are calculated.",
+                    "label": "Notification"
+                },
+                {
+                    "requirement": "Notifications about new releases should include options for instant reservation.",
+                    "label": "Notification"
+                },
+                {
+                    "requirement": "Borrowed items flagged for immediate return must trigger an urgent alert.",
+                    "label": "Loan"
+                },
+                {
+                    "requirement": "Loan extensions should be processed instantly if no reservations exist.",
+                    "label": "Loan"
+                },
+                {
+                    "requirement": "Borrowing policies for students must highlight exceptions during term breaks.",
+                    "label": "Loan"
+                },
+                {
+                    "requirement": "Reserved books requiring staff intervention must trigger priority alerts.",
+                    "label": "Reservation"
+                },
+                {
+                    "requirement": "Reserved items with damaged copies should trigger a replacement request.",
+                    "label": "Reservation"
+                },
+                {
+                    "requirement": "Reserved books flagged as uncollected must notify staff for follow-up.",
+                    "label": "Reservation"
+                },
+                {
+                    "requirement": "Borrowing history should display timestamps for each action.",
+                    "label": "Record"
+                },
+                {
+                    "requirement": "Users must receive notifications when records of fines are updated.",
+                    "label": "Record"
+                },
+                {
+                    "requirement": "Any penalties adjusted by administrators must include a log of the reason.",
+                    "label": "Record"
+                },
+                {
+                    "requirement": "Monthly newsletters should include highlights from each branch.",
+                    "label": "Library"
+                },
+                {
+                    "requirement": "Updates about community partnerships should be highlighted on the website.",
+                    "label": "Library"
+                },
+                {
+                    "requirement": "Members visiting larger locations should have access to virtual tours.",
+                    "label": "Library"
+                },
+                {
+                    "requirement": "Notifications about delayed returns must outline how fines are calculated.",
+                    "label": "Fine"
+                },
+                {
+                    "requirement": "Members who frequently dispute fines should have cases tracked.",
+                    "label": "Fine"
+                },
+                {
+                    "requirement": "Borrowers should receive a notification whenever overdue fees are applied.",
+                    "label": "Fine"
+                },
+                {
+                    "requirement": "Admins must track usage statistics for multimedia resources.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "Admin tools should enable generation of reports for stakeholders.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "Admins must have tools to approve membership fee adjustments.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "Catalog entries for rare collections must include high-resolution images.",
+                    "label": "Catalog"
+                },
+                {
+                    "requirement": "The catalog search bar must allow keyword searches in summaries.",
+                    "label": "Catalog"
+                },
+                {
+                    "requirement": "Catalog filters should include award-winning books.",
+                    "label": "Catalog"
+                },
+                {
+                    "requirement": "Members must have secure communication channels with staff.",
+                    "label": "Member"
+                },
+                {
+                    "requirement": "Borrowing histories of all members should be stored for audit.",
+                    "label": "Member"
+                },
+                {
+                    "requirement": "Members should have a feature to propose new books.",
+                    "label": "Member"
+                },
+                {
+                    "requirement": "Staff must have access to automated overdue item reports.",
+                    "label": "Report"
+                },
+                {
+                    "requirement": "Generate a report on average time books stay in the reserved queue.",
+                    "label": "Report"
+                },
+                {
+                    "requirement": "Generate quarterly reports on borrowing trends.",
+                    "label": "Report"
+                },
+                {
+                    "requirement": "Users should receive alerts about upcoming material availability.",
+                    "label": "Book"
+                },
+                {
+                    "requirement": "Featured recommendations should display crossover appeal works.",
+                    "label": "Book"
+                },
+                {
+                    "requirement": "Books nearing renewal limit must provide an alert.",
+                    "label": "Book"
+                },
+                {
+                    "requirement": "Notifications about career fairs must include participating organizations.",
+                    "label": "Event"
+                },
+                {
+                    "requirement": "Notifications for library surveys should include online links.",
+                    "label": "Event"
+                },
+                {
+                    "requirement": "Participants can join waiting lists for fully booked events.",
+                    "label": "Event"
+                },
+                {
+                    "requirement": "Staff must have access to a dashboard summarizing overdue items.",
+                    "label": "Staff"
+                },
+                {
+                    "requirement": "Staff must validate all reservations flagged as urgent.",
+                    "label": "Staff"
+                },
+                {
+                    "requirement": "Staff flagged for overdue training should receive priority access.",
+                    "label": "Staff"
+                },
+                {
+                    "requirement": "Authentication failures must trigger a lockout after five attempts.",
+                    "label": "Authentication"
+                },
+                {
+                    "requirement": "Temporary passwords must prompt users to set a permanent one.",
+                    "label": "Authentication"
+                },
+                {
+                    "requirement": "The system should lock accounts after multiple failed logins.",
+                    "label": "Authentication"
+                }
+            ]
+        },
+        "smart_home": {
+            "one-shot": [
+                {
+                    "requirement": "Automated daily backups of all system configurations are required.",
+                    "label": "System"
+                },
+                {
+                    "requirement": "Sensors should operate on low power to maximize battery life.",
+                    "label": "Sensor"
+                },
+                {
+                    "requirement": "Smart lights should function with legacy wall switches.",
+                    "label": "Light"
+                },
+                {
+                    "requirement": "Users should be able to view all connected devices from a dashboard.",
+                    "label": "User"
+                },
+                {
+                    "requirement": "The thermostat needs automatic switching between heating and cooling.",
+                    "label": "Thermostat"
+                },
+                {
+                    "requirement": "The system should allow admins to create automated security reports.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "The mobile app needs to handle interruptions like incoming calls.",
+                    "label": "App"
+                },
+                {
+                    "requirement": "Integration with doorbell cameras is required for verified entry.",
+                    "label": "Lock"
+                },
+                {
+                    "requirement": "Smart devices must reject unauthorized firmware installations.",
+                    "label": "Device"
+                }
+            ],
+            "few-shot": [
+                {
+                    "requirement": "Automated daily backups of all system configurations are required.",
+                    "label": "System"
+                },
+                {
+                    "requirement": "The system must support user-defined macros for device actions.",
+                    "label": "System"
+                },
+                {
+                    "requirement": "The platform must support on-premises and cloud deployment.",
+                    "label": "System"
+                },
+                {
+                    "requirement": "Sensors should operate on low power to maximize battery life.",
+                    "label": "Sensor"
+                },
+                {
+                    "requirement": "Sensors must reconnect automatically after power interruptions.",
+                    "label": "Sensor"
+                },
+                {
+                    "requirement": "A sensor should detect rapid changes in temperature and humidity.",
+                    "label": "Sensor"
+                },
+                {
+                    "requirement": "Smart lights should function with legacy wall switches.",
+                    "label": "Light"
+                },
+                {
+                    "requirement": "Smart lights should adjust color based on time of day.",
+                    "label": "Light"
+                },
+                {
+                    "requirement": "Cinema mode needs to gradually dim when playback is detected.",
+                    "label": "Light"
+                },
+                {
+                    "requirement": "Users should view all connected devices from a dashboard.",
+                    "label": "User"
+                },
+                {
+                    "requirement": "Users can schedule device operations for specific times.",
+                    "label": "User"
+                },
+                {
+                    "requirement": "Users must approve new devices joining the network.",
+                    "label": "User"
+                },
+                {
+                    "requirement": "The thermostat needs automatic switching between modes.",
+                    "label": "Thermostat"
+                },
+                {
+                    "requirement": "Multi-stage heating and cooling support is required.",
+                    "label": "Thermostat"
+                },
+                {
+                    "requirement": "Compressor protection should enforce minimum off-times.",
+                    "label": "Thermostat"
+                },
+                {
+                    "requirement": "The system should allow admins to create security reports.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "Admins must approve third-party integrations.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "Admins can remotely clear device caches for troubleshooting.",
+                    "label": "Admin"
+                },
+                {
+                    "requirement": "The mobile app needs to handle interruptions gracefully.",
+                    "label": "App"
+                },
+                {
+                    "requirement": "Video streams must load within 3 seconds of request.",
+                    "label": "App"
+                },
+                {
+                    "requirement": "The app shall include a setup wizard for new users.",
+                    "label": "App"
+                },
+                {
+                    "requirement": "Integration with doorbell cameras is required for entry.",
+                    "label": "Lock"
+                },
+                {
+                    "requirement": "The system needs to disable temporary codes after events.",
+                    "label": "Lock"
+                },
+                {
+                    "requirement": "Low-temperature protection is required for cold climates.",
+                    "label": "Lock"
+                },
+                {
+                    "requirement": "Smart devices must reject unauthorized firmware.",
+                    "label": "Device"
+                },
+                {
+                    "requirement": "Hardware reset capabilities are required for restoration.",
+                    "label": "Device"
+                },
+                {
+                    "requirement": "Command buffering is needed for delayed execution.",
+                    "label": "Device"
+                }
+            ]
+        }
+    },
+    "prompt_templates": {
+        "zero-shot_short": "Analyze this requirement statement and respond with ONLY a single category label (1 word) that best represents its main functionality.\n\nRequirement: {requirement}\n\nLabel:",
+        "zero-shot_medium": "You are analyzing software requirements for a {system_type} system. Respond with ONLY a single category label (1 word) that best captures the main functional aspect of this requirement.\n\nRequirement: {requirement}\n\nLabel:",
+        "zero-shot_long": "You are performing Qualitative Data Analysis on requirements for a {system_type} system.\n{context}\n\nYour task is to analyze the requirement below and respond with ONLY a single categorical label (1 word) that best represents the functional aspect or component addressed.\n\nConsider the primary functionality, system component, stakeholder perspective, and how this would be organized in a domain model.\n\nRequirement: {requirement}\n\nLabel:",
+        "one-shot_short": "Analyze requirements and respond with ONLY a single category label (1 word).\n\nExample:\nRequirement: {example_requirement}\nLabel: {example_label}\n\nRequirement: {requirement}\n\nLabel:",
+        "one-shot_medium": "You are analyzing software requirements for a {system_type} system. Respond with ONLY a single category label (1 word) that best represents the main functionality.\n\nExample:\nRequirement: {example_requirement}\nLabel: {example_label}\n\nRequirement: {requirement}\n\nLabel:",
+        "one-shot_long": "You are performing Qualitative Data Analysis on requirements for a {system_type} system.\n{context}\n\nYour task is to respond with ONLY a single categorical label (1 word) that best represents the functional aspect addressed by the requirement.\n\nConsider the primary functionality, system component, stakeholder perspective, and domain organization.\n\nExample:\nRequirement: {example_requirement}\nLabel: {example_label}\n\nRequirement: {requirement}\n\nLabel:",
+        "few-shot_short": "Analyze requirements and respond with ONLY a single category label (1 word).\n\nExamples:\nRequirement: {example1_requirement}\nLabel: {example1_label}\n\nRequirement: {example2_requirement}\nLabel: {example2_label}\n\nRequirement: {example3_requirement}\nLabel: {example3_label}\n\nRequirement: {requirement}\n\nLabel:",
+        "few-shot_medium": "You are analyzing software requirements for a {system_type} system. Respond with ONLY a single category label (1 word) that best represents the main functionality.\n\nExamples:\nRequirement: {example1_requirement}\nLabel: {example1_label}\n\nRequirement: {example2_requirement}\nLabel: {example2_label}\n\nRequirement: {example3_requirement}\nLabel: {example3_label}\n\nRequirement: {requirement}\n\nLabel:",
+        "few-shot_long": "You are performing Qualitative Data Analysis on requirements for a {system_type} system.\n{context}\n\nYour task is to respond with ONLY a single categorical label (1 word) that best represents the functional aspect addressed by the requirement.\n\nConsider the primary functionality, system component, stakeholder perspective, and domain organization.\n\nExamples:\nRequirement: {example1_requirement}\nLabel: {example1_label}\n\nRequirement: {example2_requirement}\nLabel: {example2_label}\n\nRequirement: {example3_requirement}\nLabel: {example3_label}\n\nRequirement: {requirement}\n\nLabel:"
+    },
+    "settings": {
+        "openai": {
+            "temperature": 0.0,
+            "max_tokens": 50,
+            "top_p": 1.0,
+            "frequency_penalty": 0.0,
+            "presence_penalty": 0.0
+        },
+        "experiment": {
+            "shot_types": [
+                "zero-shot",
+                "one-shot",
+                "few-shot"
+            ],
+            "prompt_lengths": [
+                "short",
+                "medium",
+                "long"
+            ],
+            "context_levels": [
+                "no_context",
+                "some_context",
+                "full_context"
+            ],
+            "num_runs": 1,
+            "batch_size": 10,
+            "sample_size": 500
+        }
+    }
+}
