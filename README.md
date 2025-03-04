@@ -2,10 +2,9 @@
 
 This repository contains the implementation of our framework for evaluating Large Language Models (LLMs) in Qualitative Data Analysis (QDA) tasks for Requirements Engineering (RE). Our research demonstrates that properly configured LLMs can significantly reduce the manual effort required for QDA in requirements engineering, with GPT-4 achieving Cohen's Kappa scores exceeding 0.7 (substantial agreement with human analysts) in few-shot learning scenarios.
 
-
-
 ## Project Structure
-```
+
+```project structure
 llm_qda_project/
 │
 ├── config/
@@ -33,26 +32,30 @@ llm_qda_project/
 ## Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/llm-qda-requirements.git
-cd llm-qda-requirements
-```
+
+    ```bash
+    git clone https://github.com/yourusername/llm-qda-requirements.git
+    cd llm-qda-requirements
+    ```
 
 2. Create a virtual environment and install dependencies:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    pip install -r requirements.txt
+    ```
 
 3. Set up your OpenAI API key (for GPT-4):
-```bash
-export OPENAI_API_KEY=your_api_key_here  # On Windows: set OPENAI_API_KEY=your_api_key_here
-```
+
+    ```bash
+    export OPENAI_API_KEY=your_api_key_here  # On Windows: set OPENAI_API_KEY=your_api_key_here
+    ```
 
 ## Configuration
 
 The `config/config.json` file contains all the settings for the experiments:
+
 - **API Keys**: Credentials for accessing LLM APIs
 - **Models**: Settings for different LLMs
 - **Datasets**: Paths and contextual information for test cases
@@ -63,11 +66,13 @@ The `config/config.json` file contains all the settings for the experiments:
 ## Usage
 
 To run the full experiment with all settings:
+
 ```bash
 python main.py
 ```
 
 To customize experiment parameters, modify the `custom_params` dictionary in `main.py`:
+
 ```python
 custom_params = {
     'shot_types': ['zero-shot', 'one-shot', 'few-shot'],
@@ -88,15 +93,15 @@ The framework evaluates LLM performance using two requirements datasets that rep
    - Loan processing and reservation handling
    - Fine calculation and payment tracking
    - Reporting and analytics capabilities
-   
+
    Each requirement is manually labeled by human analysts with functional categories such as "Catalog," "Member," "Loan," "Notification," "Authentication," and others that align with domain modeling concepts.
 
 2. **Smart Home System**: This dataset includes requirements for a modern home automation platform with various subsystems:
    - Security components (locks, cameras, motion sensors)
    - Energy management (lighting, temperature control, power consumption)
-   - Device connectivity and management 
+   - Device connectivity and management
    - User interfaces (mobile apps, voice control, control panels)
-   
+
    Requirements are categorized into labels such as "Device," "Sensor," "Lock," "Thermostat," "App," and "System" to represent the functional components of the domain.
 
 Both datasets were initially sourced from the PURE dataset collection and supplemented with additional requirements from Software Requirements Specifications (SRS) and Functional Requirements Specifications (FRS) documents. The combined dataset provides a robust foundation for testing annotation capabilities across different technical contexts.
@@ -122,10 +127,10 @@ Our framework implements an approach to evaluate LLM performance across multiple
   - *Some context*: A brief overview of the system and its primary functions is included.
   - *Full context*: Detailed information about the system architecture, terminology, and domain-specific concepts is provided, giving the model rich contextual understanding to inform its categorization decisions.
 
-
 ## Output
 
 The framework generates several outputs in the `results/` directory:
+
 - **JSON Results**: Raw experimental data and metrics
 - **Plots**: Visualizations comparing model performance across different settings
 - **Markdown Reports**: Comprehensive summaries of findings with analysis
@@ -133,6 +138,7 @@ The framework generates several outputs in the `results/` directory:
 ## Citation
 
 If you use this framework in your research, please cite:
+
 ```bibtex
 @misc{syed2025llm4qda,
       title={From Inductive to Deductive: Evaluating Large Language Models for Qualitative Data Analysis in Requirements Engineering.}, 
@@ -141,10 +147,9 @@ If you use this framework in your research, please cite:
 }
 ```
 
-
 ## Contact
 
 For questions or collaborations, please contact:
 
-- **Syed Tauhid Ullah Shah** - syed.tauhidullahshah@ucalgary.ca
-- **Mohamad Hussein** - mohamad.hussein@ucalgary.ca
+- **Syed Tauhid Ullah Shah** - <syed.tauhidullahshah@ucalgary.ca>
+- **Mohamad Hussein** - <mohamad.hussein@ucalgary.ca>
