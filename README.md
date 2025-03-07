@@ -138,7 +138,9 @@ If you use this framework in your research, please cite:
 @misc{syed2025llm4qda,
       title={From Inductive to Deductive: Evaluating Large Language Models for Qualitative Data Analysis in Requirements Engineering.}, 
       author={Shah, S. T. U., Hussein, M., Barcomb, A., & Moshirpour, M.},
-      year={2025}
+      booktitle = {Proceedings of the 8th Workshop on Natural Language Processing for Requirements Engineering (NLP4RE'25)},
+      year      = {2025},
+      
 }
 ```
 
