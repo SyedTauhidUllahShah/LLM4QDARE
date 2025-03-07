@@ -122,61 +122,61 @@ Our framework implements an approach to evaluate LLM performance across multiple
   - *Some context*: A brief overview of the system and its primary functions is included.
   - *Full context*: Detailed information about the system architecture, terminology, and domain-specific concepts is provided, giving the model rich contextual understanding to inform its categorization decisions.
 
-\begin{table}[t]
-\caption{Prompt Design Dimensions with Examples}
-\label{tab:prompt_design}
-\centering
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{p{2.2cm} p{2.2cm} p{10.6cm}}
-\toprule
-\textbf{Dimension} & \textbf{Type} & \textbf{Example} \\
-\midrule
-\multirow{3}{*}{Shot Type} 
-& Zero-shot & Analyze this requirement statement and respond with ONLY a single category label (1 word) that best represents its main functionality.\\
-& & \textbf{Requirement:} ``Notifications about lost item penalties must explain alternative settlement options.''\\
-& & \textbf{Label:} \\
-\cmidrule{2-3}
-& One-shot & Analyze requirements and respond with ONLY a single category label (1 word).\\
-& & \textbf{Example:}\\
-& & \textbf{Requirement:} ``Borrowed items flagged for immediate return due to high demand must trigger an urgent alert for users.''\\
-& & \textbf{Label:} Loan\\
-& & \textbf{Requirement:} ``Notifications about lost item penalties must explain alternative settlement options.''\\
-& & \textbf{Label:} \\
-\cmidrule{2-3}
-& Few-shot & Analyze requirements and respond with ONLY a single category label (1 word).\\
-& & \textbf{Examples:}\\
-& & \textbf{Requirement:} ``Borrowed items flagged for immediate return must trigger an urgent alert.''\\
-& & \textbf{Label:} Loan\\
-& & \textbf{Requirement:} ``Reserved books requiring staff intervention must trigger priority alerts.''\\
-& & \textbf{Label:} Reservation\\
-& & \textbf{Requirement:} ``Catalog entries for rare collections must include high-resolution images.''\\
-& & \textbf{Label:} Catalog\\
-& & \textbf{Requirement:} ``Notifications about lost item penalties must explain alternative settlement options.''\\
-& & \textbf{Label:} \\
-\midrule
-\multirow{3}{*}{Prompt Length} 
-& Short & Analyze this requirement statement and respond with ONLY a single category label (1 word) that best represents its main functionality. \\
-\cmidrule{2-3}
-& Medium & You are analyzing software requirements for a Library Management System. Respond with ONLY a single category label (1 word) that best captures the main functional aspect of this requirement. \\
-\cmidrule{2-3}
-& Long & You are performing Qualitative Data Analysis on requirements for a Library Management System. The system manages all aspects of a modern library, including resource cataloging, user management, loan processing, and digital resource management.\\
-& & Your task is to analyze the requirement below and respond with ONLY a single categorical label (1 word) that best represents the functional aspect or component addressed.\\
-& & Consider the primary functionality, system component, stakeholder perspective, and how this would be organized in a domain model. \\
-\midrule
-\multirow{3}{*}{Context} 
-& No Context & \textbf{Requirement:} ``Notifications about lost item penalties must explain alternative settlement options.''\\
-& & \textbf{Label:} \\
-\cmidrule{2-3}
-& Some Context & The Library Management System handles cataloging, user management, loans, and digital resources.\\
-& & \textbf{Requirement:} ``Notifications about lost item penalties must explain alternative settlement options.''\\
-& & \textbf{Label:} \\
-\cmidrule{2-3}
-& Full Context & The Library Management System (LMS) is designed to manage all aspects of a modern library, including resource cataloging, user management, loan processing, and digital resource management. The system tracks all physical and digital resources in the library's collection, manages user accounts and privileges, processes loans and returns, handles reservations and renewals, and manages fines and payments.\\
-& & \textbf{Requirement:} ``Notifications about lost item penalties must explain alternative settlement options.''\\
-& & \textbf{Label:} \\
-\bottomrule
-\end{tabular}
-\end{table}
+# Prompt Design for LLM-Based Qualitative Data Analysis
+
+## Table: Prompt Design Dimensions with Examples
+
+| Dimension     | Type          | Example                                                                    |
+|---------------|---------------|----------------------------------------------------------------------------|
+| Shot Type     | Zero-shot     | Analyze this requirement statement and respond with ONLY a single category label (1 word) that best represents its main functionality.
+
+Requirement: "Notifications about lost item penalties must explain alternative settlement options."
+
+Label: |
+|               | One-shot      | Analyze requirements and respond with ONLY a single category label (1 word).
+
+Example:
+Requirement: "Borrowed items flagged for immediate return due to high demand must trigger an urgent alert for users."
+Label: Loan
+
+Requirement: "Notifications about lost item penalties must explain alternative settlement options."
+
+Label: |
+|               | Few-shot      | Analyze requirements and respond with ONLY a single category label (1 word).
+
+Examples:
+Requirement: "Borrowed items flagged for immediate return must trigger an urgent alert."
+Label: Loan
+
+Requirement: "Reserved books requiring staff intervention must trigger priority alerts."
+Label: Reservation
+
+Requirement: "Catalog entries for rare collections must include high-resolution images."
+Label: Catalog
+
+Requirement: "Notifications about lost item penalties must explain alternative settlement options."
+
+Label: |
+| Prompt Length | Short         | Analyze this requirement statement and respond with ONLY a single category label (1 word) that best represents its main functionality. |
+|               | Medium        | You are analyzing software requirements for a Library Management System. Respond with ONLY a single category label (1 word) that best captures the main functional aspect of this requirement. |
+|               | Long          | You are performing Qualitative Data Analysis on requirements for a Library Management System. The system manages all aspects of a modern library, including resource cataloging, user management, loan processing, and digital resource management.
+
+Your task is to analyze the requirement below and respond with ONLY a single categorical label (1 word) that best represents the functional aspect or component addressed.
+
+Consider the primary functionality, system component, stakeholder perspective, and how this would be organized in a domain model. |
+| Context       | No Context    | Requirement: "Notifications about lost item penalties must explain alternative settlement options."
+
+Label: |
+|               | Some Context  | The Library Management System handles cataloging, user management, loans, and digital resources.
+
+Requirement: "Notifications about lost item penalties must explain alternative settlement options."
+
+Label: |
+|               | Full Context  | The Library Management System (LMS) is designed to manage all aspects of a modern library, including resource cataloging, user management, loan processing, and digital resource management. The system tracks all physical and digital resources in the library's collection, manages user accounts and privileges, processes loans and returns, handles reservations and renewals, and manages fines and payments.
+
+Requirement: "Notifications about lost item penalties must explain alternative settlement options."
+
+Label: |
 
 
 ## Output
