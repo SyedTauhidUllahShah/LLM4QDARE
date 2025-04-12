@@ -2,6 +2,8 @@
 
 This repository contains the implementation of our framework for evaluating Large Language Models (LLMs) in Qualitative Data Analysis (QDA) tasks for Requirements Engineering (RE). Our research demonstrates that properly configured LLMs can significantly reduce the manual effort required for QDA in requirements engineering, with GPT-4 achieving Cohen's Kappa scores exceeding 0.7 (substantial agreement with human analysts) in few-shot learning scenarios.
 
+![LLM-QDA-Overview.png](media/overview.png)
+
 ## Project Structure
 
 ```project structure
@@ -134,6 +136,10 @@ The framework generates several outputs in the `results/` directory:
 - **JSON Results**: Raw experimental data and metrics
 - **Plots**: Visualizations comparing model performance across different settings
 - **Markdown Reports**: Comprehensive summaries of findings with analysis
+
+### Results
+
+![Detailed performance metrics for different models in Zero-shot, One-shot, and Few-shot settings across test cases](media/performance.png)
 
 ## Citation
 
