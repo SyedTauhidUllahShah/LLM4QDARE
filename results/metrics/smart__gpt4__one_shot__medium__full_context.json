@@ -1,0 +1,19 @@
+{
+  "exp_id": "smart__gpt4__one_shot__medium__full_context",
+  "best_run_idx": 0,
+  "best_metrics": {
+    "accuracy": 0.7767857142857143,
+    "precision": 0.8192799134741967,
+    "recall": 0.7230254002943635,
+    "f1": 0.746441368017718,
+    "kappa": 0.739306018655913
+  },
+  "consistency": {
+    "mean_kappa": 0.739306018655913,
+    "std_kappa": 0.0,
+    "icc": NaN,
+    "kappas_per_run": [
+      0.739306018655913
+    ]
+  }
+}

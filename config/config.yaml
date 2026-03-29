@@ -1,0 +1,102 @@
+# =============================================================================
+# Experiment Configuration
+# LLMs-Based QDA in Requirements Engineering
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Model Configurations
+# ---------------------------------------------------------------------------
+models:
+  gpt4:
+    name: "gpt-5-nano"                   # GPT-5 Nano (fastest, most cost-efficient GPT-5; snapshot: gpt-5-nano-2025-08-07)
+    api_type: "openai"
+    temperature: null                    # gpt-5-nano only supports default temperature; set null to omit
+    max_tokens: 2048                     # gpt-5-nano is a reasoning model; needs extra tokens for internal reasoning before output
+    reasoning_effort: "low"              # minimise reasoning tokens → faster, cheaper, leaves room for the actual response
+    enabled: true
+    request_timeout: 30                  # seconds per request
+    max_retries: 5
+    retry_backoff: 2.0                   # exponential backoff base
+
+  mistral:
+    name: "mistralai/Mistral-7B-Instruct-v0.2"
+    api_type: "huggingface"
+    temperature: 1.0                     # ignored when do_sample=False
+    do_sample: false                     # greedy decoding ≡ temperature=0
+    max_new_tokens: 50
+    device_map: "auto"
+    torch_dtype: "float16"
+    load_in_4bit: false                  # set true to reduce VRAM usage
+    enabled: true
+    batch_size: 8
+
+  llama2:
+    name: "meta-llama/Llama-2-7b-chat-hf"
+    api_type: "huggingface"
+    temperature: 1.0
+    do_sample: false
+    max_new_tokens: 50
+    device_map: "auto"
+    torch_dtype: "float16"
+    load_in_4bit: false
+    enabled: true
+    batch_size: 8
+
+# ---------------------------------------------------------------------------
+# Dataset Configurations
+# ---------------------------------------------------------------------------
+datasets:
+  lms:
+    path: "data/lms.csv"
+    name: "Library Management System"
+    system_type: "Library Management"
+    requirement_col: "Requirement Statement"
+    label_col: "Label"
+    encoding: "utf-8-sig"
+
+  smart:
+    path: "data/smart.csv"
+    name: "Smart Home System"
+    system_type: "Smart Home"
+    requirement_col: "Requirement Statement"
+    label_col: "Label"
+    encoding: "utf-8-sig"
+
+# ---------------------------------------------------------------------------
+# Experiment Settings
+# ---------------------------------------------------------------------------
+experiment:
+  shot_types:
+    - "zero_shot"
+    - "one_shot"
+    - "few_shot"
+
+  prompt_lengths:
+    - "short"
+    - "medium"
+    - "long"
+
+  context_levels:
+    - "no_context"
+    - "some_context"
+    - "full_context"
+
+  n_runs: 5                              # Repeated runs for consistency analysis (RQ3)
+  n_few_shot_examples: 3                 # Examples in few-shot prompts
+  n_one_shot_examples: 1                 # Examples in one-shot prompts
+  n_examples_per_class: 2               # Examples per label class in the few-shot pool
+  random_seed: 42
+  sample_size: null                      # Set to integer for quick testing (e.g., 100), null = use all data
+  skip_existing: true                    # Skip already-computed experiments (resume support)
+
+# ---------------------------------------------------------------------------
+# Output Configuration
+# ---------------------------------------------------------------------------
+output:
+  results_dir: "results"
+  raw_dir: "results/raw"
+  metrics_dir: "results/metrics"
+  tables_dir: "results/tables"
+  figures_dir: "results/figures"
+  log_level: "INFO"
+  log_file: "results/experiment.log"

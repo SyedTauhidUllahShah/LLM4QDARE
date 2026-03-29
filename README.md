@@ -1,162 +1,429 @@
-# From Inductive to Deductive: Evaluating Large Language Models for Qualitative Data Analysis in Requirements Engineering
-This repository contains the implementation of our framework for evaluating Large Language Models (LLMs) in Qualitative Data Analysis (QDA) tasks for Requirements Engineering (RE). Our research demonstrates that properly configured LLMs can significantly reduce the manual effort required for QDA in requirements engineering, with GPT-4 achieving Cohen's Kappa scores exceeding 0.7 (substantial agreement with human analysts) in few-shot learning scenarios.
+# From Inductive to Deductive: LLMs-Based Qualitative Data Analysis in Requirements Engineering
 
-![LLM-QDA-Overview.png](media/overview.png)
 
-## Project Structure
 
-```project structure
-llm_qda_project/
+This repository contains the full experiment pipeline for evaluating Large Language Models (LLMs) on Qualitative Data Analysis (QDA) annotation tasks in Requirements Engineering. The pipeline covers all experimental conditions reported in the paper: zero-shot, one-shot, and few-shot annotation across varying prompt lengths and context levels, with full evaluation metrics and consistency analysis.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Repository Structure](#repository-structure)
+- [Datasets](#datasets)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running Experiments](#running-experiments)
+- [Generating Result Tables](#generating-result-tables)
+- [Experiment Design](#experiment-design)
+- [Prompt Design](#prompt-design)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Results](#results)
+- [Implementation Notes](#implementation-notes)
+- [Citation](#citation)
+- [Contact](#contact)
+
+---
+
+## Overview
+
+Requirements Engineering (RE) involves transforming stakeholder inputs into structured software designs. Qualitative Data Analysis (QDA) enables systematic annotation of unstructured requirement statements by assigning categorical labels (e.g., `Loan`, `Notification`, `Sensor`) that correspond directly to domain model classes.
+
+This work investigates whether LLMs can replace or assist human analysts in this annotation process. We evaluate models across 27 prompt configurations (3 shot types × 3 prompt lengths × 3 context levels) on two real-world RE datasets, measuring alignment with human-consensus ground truth using Cohen's Kappa and a suite of classification metrics.
+
+**Key findings (Smart Home dataset, GPT-5-nano):**
+- Few-shot with medium prompts achieves the highest Kappa of **0.771** and accuracy of **80.4%**
+- Short prompts fail completely (Kappa ≈ 0.004) — sufficient instruction detail is essential
+- Zero-shot → one-shot is the biggest performance jump; one-shot → few-shot yields further but smaller gains
+- Medium prompts outperform long prompts in few-shot settings — examples reduce the need for verbose guidelines
+
+---
+
+## Repository Structure
+
+```
+llm/
+├── data/
+│   ├── lms.csv                  # Library Management System (3,567 requirements, 14 labels)
+│   └── smart.csv                # Smart Home System (466 requirements, 9 labels)
 │
 ├── config/
-│   └── config.json         # Configuration for models, datasets, and experimental settings
-│
-├── data/
-│   ├── lms.csv             # Library Management System requirements dataset
-│   └── smart.csv           # Smart Home System requirements dataset
+│   └── config.yaml              # All experiment parameters (models, datasets, shots, etc.)
 │
 ├── src/
-│   ├── init.py
-│   ├── data_loader.py      # Handles loading and preprocessing of datasets
-│   ├── models.py           # Interface for LLMs (GPT-4)
-│   ├── evaluation.py       # Evaluation metrics and experiment orchestration
-│   └── visualization.py    # Results visualization and report generation
+│   ├── data_loader.py           # CSV loading, label cleaning, stratified few-shot/test split
+│   ├── prompt_builder.py        # 27-variant prompt factory (shot × length × context)
+│   ├── label_extractor.py       # Robust 4-stage label extraction from raw LLM output
+│   ├── evaluator.py             # Kappa, Accuracy, Precision, Recall, F1, SD, ICC
+│   ├── pipeline.py              # Experiment orchestrator with incremental saving and resume
+│   └── models/
+│       ├── base_model.py        # Abstract base class
+│       ├── gpt4_model.py        # OpenAI API wrapper (GPT-5-nano / GPT-4) with retry back-off
+│       ├── mistral_model.py     # Mistral-7B-Instruct via HuggingFace (batched inference)
+│       └── llama_model.py       # LLaMA-2-7B-Chat via HuggingFace
+│
+├── analysis/
+│   └── generate_tables.py       # Reproduces all paper tables as CSV and LaTeX
 │
 ├── results/
-│   └── .gitkeep            # Directory for output files (plots, reports, JSON results)
+│   ├── raw/                     # Per-run predictions (JSON, one file per run)
+│   ├── metrics/                 # Aggregated metrics per condition (JSON)
+│   └── tables/                  # Output tables (CSV + LaTeX, generated by analysis script)
 │
-├── main.py                 # Main script to run experiments
-├── requirements.txt        # Python dependencies
-└── README.md               # This file
+├── main.py                      # CLI entry point
+├── requirements.txt
+└── .env.example                 # API key template
 ```
+
+---
+
+## Datasets
+
+| Dataset | File | Requirements | Labels |
+|---|---|---|---|
+| Library Management System | `data/lms.csv` | 3,567 | 14 |
+| Smart Home System | `data/smart.csv` | 466 | 9 |
+
+Both files have two columns: `Requirement Statement` and `Label`. Labels are the ground-truth consensus reached by two independent human analysts after resolving disagreements (inter-analyst Kappa: 0.80 for LMS, 0.78 for Smart Home).
+
+**LMS labels:** `Admin`, `Authentication`, `Book`, `Catalog`, `Event`, `Fine`, `Library`, `Loan`, `Member`, `Notification`, `Record`, `Report`, `Reservation`, `Staff`
+
+**Smart Home labels:** `Admin`, `MobileApp`, `Sensor`, `SmartDevice`, `SmartHomeSystem`, `SmartLight`, `SmartLock`, `SmartThermostat`, `User`
+
+---
 
 ## Installation
 
-1. Clone the repository:
+### Prerequisites
 
-    ```bash
-    git clone https://github.com/yourusername/llm-qda-requirements.git
-    cd llm-qda-requirements
-    ```
+- Python 3.10+
+- CUDA-capable GPU (for Mistral and LLaMA-2; A100 used in the paper)
+- OpenAI API key (for GPT-5-nano / GPT-4 experiments)
+- HuggingFace token (for LLaMA-2, which is a gated model)
 
-2. Create a virtual environment and install dependencies:
+### Steps
 
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    pip install -r requirements.txt
-    ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/SyedTauhidUllahShah/LLM4QDARE
+cd LLM4QDARE
 
-3. Set up your OpenAI API key (for GPT-4):
+# 2. Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate        # Linux / macOS
+# venv\Scripts\activate         # Windows
 
-    ```bash
-    export OPENAI_API_KEY=your_api_key_here  # On Windows: set OPENAI_API_KEY=your_api_key_here
-    ```
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Configure API keys
+cp .env.example .env
+# Edit .env and fill in OPENAI_API_KEY and HUGGINGFACE_TOKEN
+```
+
+---
 
 ## Configuration
 
-The `config/config.json` file contains all the settings for the experiments:
+All parameters are in `config/config.yaml`. Key settings:
 
-- **API Keys**: Credentials for accessing LLM APIs
-- **Models**: Settings for different LLMs
-- **Datasets**: Paths and contextual information for test cases
-- **Examples**: One-shot and few-shot examples for each dataset
-- **Prompt Templates**: Various prompt designs with different shot types and lengths
-- **Experimental Settings**: Parameters for running experiments
+```yaml
+models:
+  gpt4:
+    name: "gpt-5-nano"           # Model ID — change to gpt-4-turbo-preview for GPT-4
+    temperature: null            # Reasoning models do not accept temperature
+    max_tokens: 2048             # Must be high enough for reasoning + response tokens
+    reasoning_effort: "low"      # Minimises reasoning tokens: faster and cheaper
 
-## Usage
+experiment:
+  shot_types:     [zero_shot, one_shot, few_shot]
+  prompt_lengths: [short, medium, long]
+  context_levels: [no_context, some_context, full_context]
+  n_runs:         5              # Repeated runs for consistency analysis (RQ3)
+  sample_size:    null           # Set to integer for quick testing (e.g. 50)
+  skip_existing:  true           # Resume interrupted runs automatically
+```
 
-To run the full experiment with all settings:
+---
+
+## Running Experiments
+
+### Full replication
 
 ```bash
 python main.py
 ```
 
-To customize experiment parameters, modify the `custom_params` dictionary in `main.py`:
+### Common partial runs
 
-```python
-custom_params = {
-    'shot_types': ['zero-shot', 'one-shot', 'few-shot'],
-    'prompt_lengths': ['long'],
-    'context_levels': ['full_context'],
-    'sample_size': None,  # Set to None to process all samples
-    'num_runs': 1
-}
+```bash
+# Quick sanity check — 10 rows, GPT-5-nano, best settings
+python main.py --models gpt4 --datasets smart --shot-types few_shot \
+               --lengths medium --contexts full_context --sample-size 10 --n-runs 1
+
+# All three shot types for Smart Home only
+python main.py --models gpt4 --datasets smart --lengths long --contexts full_context --n-runs 1
+
+# Run short and medium prompts in parallel (two terminals / background processes)
+python main.py --models gpt4 --datasets smart --lengths short --contexts full_context --n-runs 1 &
+python main.py --models gpt4 --datasets smart --lengths medium --contexts full_context --n-runs 1 &
+
+# Local models with 4-bit quantisation (reduces VRAM requirement)
+python main.py --models mistral llama2 --load-4bit
+
+# Resume an interrupted run
+python main.py --skip-existing
 ```
 
-## Datasets
+### CLI reference
 
-The framework evaluates LLM performance using two requirements datasets that represent different application domains:
+```
+python main.py [OPTIONS]
 
-1. **Library Management System (LMS)**: This dataset contains a diverse collection of functional and non-functional requirements for an integrated library system. The requirements encompass multiple aspects including:
-   - Catalog management for books and digital resources
-   - User account administration and authentication
-   - Loan processing and reservation handling
-   - Fine calculation and payment tracking
-   - Reporting and analytics capabilities
+Options:
+  --config PATH           YAML config file (default: config/config.yaml)
+  --models   gpt4 mistral llama2
+  --datasets lms smart
+  --shot-types  zero_shot one_shot few_shot
+  --lengths     short medium long
+  --contexts    no_context some_context full_context
+  --sample-size N         Sample N requirements per dataset
+  --n-runs N              Number of repeated runs per condition
+  --skip-existing         Resume: skip already-completed conditions
+  --no-skip               Force re-run all conditions
+  --load-4bit             4-bit quantisation for HuggingFace models
+  --log-level             DEBUG | INFO | WARNING | ERROR
+```
 
-   Each requirement is manually labeled by human analysts with functional categories such as "Catalog," "Member," "Loan," "Notification," "Authentication," and others that align with domain modeling concepts.
+### Output files
 
-2. **Smart Home System**: This dataset includes requirements for a modern home automation platform with various subsystems:
-   - Security components (locks, cameras, motion sensors)
-   - Energy management (lighting, temperature control, power consumption)
-   - Device connectivity and management
-   - User interfaces (mobile apps, voice control, control panels)
+Each completed run saves two files:
 
-   Requirements are categorized into labels such as "Device," "Sensor," "Lock," "Thermostat," "App," and "System" to represent the functional components of the domain.
+```
+results/raw/smart__gpt4__few_shot__medium__full_context__run0.json   # predictions
+results/metrics/smart__gpt4__few_shot__medium__full_context.json     # aggregated metrics
+```
 
-Both datasets were initially sourced from the PURE dataset collection and supplemented with additional requirements from Software Requirements Specifications (SRS) and Functional Requirements Specifications (FRS) documents. The combined dataset provides a robust foundation for testing annotation capabilities across different technical contexts.
+Filename format: `{dataset}__{model}__{shot_type}__{length}__{context}__run{N}.json`
 
-The datasets are stored as CSV files (`lms.csv` and `smart.csv`) in the `data/` directory, with each row containing a requirement statement and its corresponding human-assigned label. Our framework uses these human annotations as the ground truth for evaluating LLM performance, measuring how closely the model-generated labels match the expert-created ones.
+---
 
-## Experimental Parameters
+## Generating Result Tables
 
-Our framework implements an approach to evaluate LLM performance across multiple dimensions. One can configure the following key experimental parameters to explore different aspects of LLM-based qualitative data analysis:
+```bash
+python analysis/generate_tables.py
+```
 
-- **Shot Types**: This parameter controls the learning approach used by the LLMs:
-  - *Zero-shot (inductive)*: The model receives no examples and must rely entirely on its pre-trained knowledge to generate labels. This approach tests the model's ability to inductively reason about requirements without specific guidance.
-  - *One-shot*: A single labeled example is provided within the prompt, giving the model minimal guidance on the expected output format and categorization approach.
-  - *Few-shot (deductive)*: Multiple examples (typically 3-5) are included in the prompt, allowing the model to recognize patterns and apply deductive reasoning to categorize new requirements. This approach more closely resembles traditional deductive QDA methods.
+Outputs to `results/tables/`:
 
-- **Prompt Lengths**: This parameter adjusts the verbosity and detail level of instructions given to the LLM:
-  - *Short*: Concise prompts with minimal instructions, typically 1-2 sentences outlining the basic task.
-  - *Medium*: More detailed prompts that include additional guidance about the categorization criteria and expected outcomes.
-  - *Long*: Comprehensive prompts with extensive instructions about QDA methodology, domain-specific considerations, and detailed guidance on how to approach the annotation task.
+| File | Paper Table | Description |
+|---|---|---|
+| `kappa_by_shot.csv/.tex` | Table 2 | Kappa by model × shot type |
+| `kappa_by_length.csv/.tex` | Table 3 | Kappa by model × prompt length |
+| `consistency.csv/.tex` | Table 4 | SD and ICC across multiple runs |
+| `kappa_by_context.csv/.tex` | Table 5 | Kappa by context level |
+| `full_metrics.csv/.tex` | Table 6 | Accuracy, Precision, Recall, F1 |
 
-- **Context Levels**: This parameter controls how much background information about the domain is provided:
-  - *No context*: Only the requirement statement is provided without any domain information.
-  - *Some context*: A brief overview of the system and its primary functions is included.
-  - *Full context*: Detailed information about the system architecture, terminology, and domain-specific concepts is provided, giving the model rich contextual understanding to inform its categorization decisions.
+---
 
-## Output
+## Experiment Design
 
-The framework generates several outputs in the `results/` directory:
+### Shot Type
 
-- **JSON Results**: Raw experimental data and metrics
-- **Plots**: Visualizations comparing model performance across different settings
-- **Markdown Reports**: Comprehensive summaries of findings with analysis
+| Type | Examples in prompt | QDA analogue |
+|---|---|---|
+| Zero-shot | 0 | Inductive |
+| One-shot | 1 | Deductive (minimal) |
+| Few-shot | 3 (stratified across labels) | Deductive (full) |
 
-### Results
+### Prompt Length
 
-![Detailed performance metrics for different models in Zero-shot, One-shot, and Few-shot settings across test cases](media/performance.png)
+| Length | Content |
+|---|---|
+| Short | Task instruction only (1–2 sentences) |
+| Medium | Task + system-type framing + context description |
+| Long | Full QDA guidelines + domain vocabulary + label hint list + step-by-step reasoning scaffold |
+
+### Context Level
+
+| Level | Content |
+|---|---|
+| No context | Requirement statement only |
+| Some context | 1–2 sentence system description |
+| Full context | All system components defined with responsibilities |
+
+---
+
+## Prompt Design
+
+Prompts in this implementation are more detailed than the original paper's templates. Long prompts include:
+
+- Explicit QDA methodology framing and 5-point coding guidelines
+- Full system domain vocabulary (all component definitions)
+- The complete valid label set as a hint
+- Step-by-step reasoning scaffold
+- Structured few-shot example blocks
+
+Example — Few-shot, Long, Full Context (Smart Home):
+
+```
+You are an expert Requirements Engineer performing systematic QDA coding...
+
+System: Smart Home
+
+System Context:
+  • Sensor          – Environmental and security sensing...
+  • SmartThermostat – Intelligent climate management...
+  [all 9 components listed with responsibilities]
+
+Valid labels: Admin, MobileApp, Sensor, SmartDevice, ...
+
+QDA Coding Guidelines:
+  1. Each requirement maps to exactly ONE primary label...
+  [5 guidelines]
+
+Labeled Examples:
+  Example 1:
+    Requirement: "..."
+    Label: Sensor
+
+Task: Apply the same QDA coding approach...
+Requirement: "..."
+
+Think step-by-step:
+  1. What is the main functional subject?
+  2. Which component owns this?
+  3. Does any example match this pattern?
+  4. Which label fits best?
+
+Respond with ONLY the label (one PascalCase word):
+```
+
+---
+
+## Evaluation Metrics
+
+| Metric | Description |
+|---|---|
+| Cohen's Kappa | Inter-rater agreement vs. human consensus. > 0.61 = substantial, > 0.81 = almost perfect |
+| Accuracy | Proportion of exactly correct labels |
+| Precision (macro) | Correctness of positive predictions across all classes |
+| Recall (macro) | Coverage of true labels across all classes |
+| F1-score (macro) | Harmonic mean of precision and recall |
+| SD | Standard deviation of Kappa across N runs (consistency) |
+| ICC (2,1) | Intraclass correlation of label agreement across runs |
+
+---
+
+## Results
+
+> Results reported for **Smart Home dataset, GPT-5-nano, full context**.
+> LMS dataset results pending — run `python main.py --datasets lms` to generate.
+
+### RQ1 — Shot Type Comparison (Long Prompt)
+
+| Shot Type | Kappa | Accuracy | Precision | Recall | F1 |
+|---|---|---|---|---|---|
+| Zero-shot | 0.691 | 73.2% | 0.765 | 0.714 | 0.716 |
+| One-shot | 0.709 | 74.8% | 0.758 | 0.724 | 0.725 |
+| **Few-shot** | **0.714** | **75.2%** | **0.777** | **0.730** | **0.735** |
+
+Few-shot consistently outperforms. The largest gain is zero-shot → one-shot (+0.017 Kappa), confirming that a single example provides substantial orientation.
+
+### RQ2 — Prompt Length Comparison (Full Context)
+
+| | Short | Medium | Long |
+|---|---|---|---|
+| **Zero-shot Kappa** | 0.004 | 0.678 | **0.691** |
+| **One-shot Kappa** | 0.323 | **0.739** | 0.709 |
+| **Few-shot Kappa** | 0.358 | **0.771** | 0.714 |
+
+**Notable findings:**
+- Short prompts fail entirely (Kappa ≈ 0.004) — the model cannot produce valid labels without sufficient instruction
+- Medium prompts outperform long for one-shot and few-shot — when examples are present, verbose guidelines add noise
+- Long prompts only win for zero-shot — where detailed context is the only available guidance
+- **Best overall: few-shot + medium prompt → Kappa 0.771, Accuracy 80.4%**
+
+### Per-Label Accuracy (Few-shot, Long, Full Context)
+
+| Label | Total | Correct | Accuracy |
+|---|---|---|---|
+| Admin | 98 | 93 | 94.9% |
+| SmartThermostat | 29 | 24 | 82.8% |
+| SmartLight | 36 | 29 | 80.6% |
+| Sensor | 77 | 60 | 77.9% |
+| SmartHomeSystem | 38 | 28 | 73.7% |
+| SmartDevice | 37 | 25 | 67.6% |
+| MobileApp | 33 | 22 | 66.7% |
+| SmartLock | 31 | 18 | 58.1% |
+| User | 69 | 38 | 55.1% |
+
+`User` and `SmartLock` are the hardest labels — their requirements overlap semantically with `MobileApp` and `SmartDevice` respectively.
+
+---
+
+## Implementation Notes
+
+### GPT-5-nano specifics
+
+GPT-5-nano is a reasoning model and requires several non-standard API parameters:
+
+```python
+# Use max_completion_tokens (not max_tokens)
+# Do not pass temperature (only default=1 supported)
+# Use reasoning_effort="low" to cap internal reasoning tokens
+client.chat.completions.create(
+    model="gpt-5-nano",
+    messages=[...],
+    max_completion_tokens=2048,
+    reasoning_effort="low",
+)
+```
+
+With `reasoning_effort="low"`, each request uses ~32–64 reasoning tokens before producing output. Without it, the model can exhaust the token budget on reasoning and return an empty response.
+
+### Incremental saving and resume
+
+The pipeline saves progress after every single API call to a `.partial.json` file. If a run is interrupted, restart with `--skip-existing` to resume from the last saved checkpoint — no predictions are lost.
+
+### Label extraction
+
+The `LabelExtractor` uses a 4-stage pipeline to handle noisy LLM output:
+1. Exact match (case-insensitive) of the full response
+2. Scan for any known label as a whole word within the response
+3. Token-by-token exact match
+4. Fuzzy matching via `SequenceMatcher` (threshold: 0.80)
+
+---
 
 ## Citation
 
-If you use this framework in your research, please cite:
-
 ```bibtex
-@misc{syed2025llm4qda,
-      title={From Inductive to Deductive: Evaluating Large Language Models for Qualitative Data Analysis in Requirements Engineering.}, 
-      author={Shah, S. T. U., Hussein, M., Barcomb, A., & Moshirpour, M.},
-      booktitle = {Proceedings of the 8th Workshop on Natural Language Processing for Requirements Engineering (NLP4RE'25)},
-      year = {2025},
-      
+
+
+@inproceedings{syed,
+  author    = {Syed Tauhid Ullah Shah and
+               Mohamad Hussein and
+               Ann Barcomb and
+               Mohammad Moshirpour},
+  title     = {From Inductive to Deductive: {LLMs}-Based Qualitative Data Analysis in Requirements Engineering},
+  booktitle = {Proceedings of the 8th Workshop on Natural Language Processing for Requirements Engineering (NLP4RE'25) co-located with REFSQ 2025},
+  series    = {CEUR Workshop Proceedings},
+  volume    = {3959},
+  publisher = {CEUR-WS.org},
+  year      = {2025}
 }
 ```
 
+---
+
 ## Contact
 
-For questions or collaborations, please contact:
+- **Syed Tauhid Ullah Shah** — University of Calgary · [syed.tauhidullahshah@ucalgary.ca](mailto:syed.tauhidullahshah@ucalgary.ca)
+- **Mohammad Hussein** — University of Calgary · [mohamad.hussein@ucalgary.ca](mailto:mohamad.hussein@ucalgary.ca)
 
-- **Syed Tauhid Ullah Shah** - <syed.tauhidullahshah@ucalgary.ca>
-- **Mohamad Hussein** - <mohamad.hussein@ucalgary.ca>
+---
+
+## License
+
+[Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
